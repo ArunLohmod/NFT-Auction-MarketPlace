@@ -10,7 +10,10 @@ contract MyToken is ERC721, Ownable {
 
     Counters.Counter private _tokenIdCounter;
 
-    constructor() ERC721("MyToken", "MTK") {}
+    constructor()
+        ERC721("MyToken", "MTK")
+        Ownable(msg.sender)
+    {}
 
     function safeMint(address to) public onlyOwner {
         uint256 tokenId = _tokenIdCounter.current();
