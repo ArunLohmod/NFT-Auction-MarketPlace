@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
@@ -96,8 +96,11 @@ contract Auction is IERC721Receiver {
         auction storage newAuction = auctions[_auctionId];
 
         newAuction.prevBidders.push(newAuction.highestBidder);
-
         newAuction.prevBidAmounts.push(newAuction.highestBid);
+
+        if(newAuction.auctioner != newAuction.highestBidder){
+           payable(newAuction.highestBidder).transfer(newAuction.highestBid);
+        }
 
         participatedAuction[newAuction.highestBidder][_auctionId] = newAuction
             .highestBid;
@@ -130,13 +133,6 @@ contract Auction is IERC721Receiver {
         );
 
         if (newAuction.prevBidders.length > 0) {
-            for (uint256 i = 1; i < newAuction.prevBidders.length; i++) {
-                address payable give = payable(newAuction.prevBidders[i]);
-
-                uint256 repay = newAuction.prevBidAmounts[i];
-
-                give.transfer(repay);
-            }
 
             collectedArts[newAuction.highestBidder].push(newAuction.tokenId);
 
